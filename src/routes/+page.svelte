@@ -11,6 +11,8 @@
   import Card from '$lib/components/ui/card.svelte';
   import Button from '$lib/components/ui/button.svelte';
   import { Trash2 } from 'lucide-svelte';
+  import { templates } from '$lib/data/templates';
+  import { resetCompletedState } from '$lib/stores/generator';
   
   // Editor components
   import EditorToolbar from '$lib/components/editor/Toolbar.svelte';
@@ -37,6 +39,17 @@
     } else {
       selectedTemplates = [...selectedTemplates, templateId];
     }
+  }
+
+  function handleToggleAll() {
+    const allSelected = templates.every(t => selectedTemplates.includes(t.id));
+    if (allSelected) {
+      selectedTemplates = [];
+    } else {
+      selectedTemplates = templates.map(t => t.id);
+    }
+    // Reset completed state when changing selection
+    resetCompletedState();
   }
 
   function clearImage() {
@@ -94,6 +107,7 @@
                   <TemplateSelector 
                     {selectedTemplates} 
                     onToggle={handleTemplateToggle}
+                    onToggleAll={handleToggleAll}
                     onCustomClick={() => customModalOpen = true}
                   />
                 </div>

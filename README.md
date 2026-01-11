@@ -1,21 +1,44 @@
 # enowX Forger
 
-A cross-platform desktop application for generating app icons across multiple platforms from a single source image. Built with Tauri v2, SvelteKit, and Tailwind CSS.
+A cross-platform desktop application for generating app icons across multiple platforms from a single source image.
 
-![enowX Forger](static/app-icon-hd.png)
+<p align="center">
+  <img src="static/app-icon-hd.png" alt="enowX Forger" width="128" height="128">
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Tauri-24C8D8?style=for-the-badge&logo=tauri&logoColor=white" alt="Tauri">
+  <img src="https://img.shields.io/badge/SvelteKit-FF3E00?style=for-the-badge&logo=svelte&logoColor=white" alt="SvelteKit">
+  <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind CSS">
+  <img src="https://img.shields.io/badge/Rust-000000?style=for-the-badge&logo=rust&logoColor=white" alt="Rust">
+  <img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript">
+</p>
+
+## Table of Contents
+
+- [Features](#features)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Building](#building)
+- [Project Structure](#project-structure)
+- [Contributing](#contributing)
+- [Tech Stack](#tech-stack)
+- [License](#license)
+- [Author](#author)
 
 ## Features
 
 ### Icon Generation
-- Support for 35+ platform templates including:
-  - Desktop: Tauri, Electron, NW.js, Wails, Windows, macOS, Linux
-  - Mobile: Android, iOS, Flutter, React Native, Capacitor, Xamarin, .NET MAUI
-  - Web: Next.js, Nuxt, SvelteKit, PWA, Favicon, Chrome/Firefox Extensions
-  - Game Engines: Unity, Unreal Engine, Godot, GameMaker, Steam, itch.io
-  - Other: VS Code Extension, JetBrains Plugin, npm, GitHub, Discord Bot, Slack App
+- Support for 35+ platform templates:
+  - **Desktop**: Tauri, Electron, NW.js, Wails, Windows, macOS, Linux
+  - **Mobile**: Android, iOS, Flutter, React Native, Capacitor, Xamarin, .NET MAUI
+  - **Web**: Next.js, Nuxt, SvelteKit, PWA, Favicon, Chrome/Firefox Extensions
+  - **Game Engines**: Unity, Unreal Engine, Godot, GameMaker, Steam, itch.io
+  - **Other**: VS Code Extension, JetBrains Plugin, npm, GitHub, Discord Bot, Slack App
 - Drag & drop image upload
 - Background remover tool
-- Custom template support for specific icon sizes
+- Custom template support
+- Batch generation with progress tracking
 
 ### Built-in Editor
 - Layer-based image editing
@@ -23,21 +46,21 @@ A cross-platform desktop application for generating app icons across multiple pl
 - Text tool with font customization
 - Fill and stroke options
 - Transform controls (position, size, rotation)
-- Keyboard shortcuts for efficient workflow
+- Keyboard shortcuts
 
 ### Icon Discovery
 - Browse 150,000+ icons from Iconify
 - Search icons and collections
 - Favorite icons and collections
 - Download in SVG, PNG, or WebP format
-- Multiple size options
 
 ## Installation
 
 ### Prerequisites
+
 - [Node.js](https://nodejs.org/) 18+ or [Bun](https://bun.sh/)
 - [Rust](https://www.rust-lang.org/tools/install)
-- Platform-specific dependencies for Tauri: [Tauri Prerequisites](https://v2.tauri.app/start/prerequisites/)
+- Platform-specific dependencies: [Tauri Prerequisites](https://v2.tauri.app/start/prerequisites/)
 
 ### Setup
 
@@ -57,6 +80,13 @@ bun run tauri dev
 npm run tauri dev
 ```
 
+## Usage
+
+1. **Generate Tab** - Upload a source image, select target platforms, and generate icons
+2. **Editor Tab** - Create or edit icons using the built-in editor
+3. **Discovery Tab** - Browse and download icons from Iconify
+4. **Settings Tab** - Configure output paths and default formats
+
 ## Building
 
 ```bash
@@ -66,14 +96,7 @@ bun run tauri build
 npm run tauri build
 ```
 
-The built application will be available in `src-tauri/target/release/bundle/`.
-
-## Usage
-
-1. **Generate Tab**: Upload a source image, select target platforms, and generate icons
-2. **Editor Tab**: Create or edit icons using the built-in editor
-3. **Discovery Tab**: Browse and download icons from Iconify
-4. **Settings Tab**: Configure output paths and default formats
+Output will be in `src-tauri/target/release/bundle/`.
 
 ## Project Structure
 
@@ -83,17 +106,17 @@ enowX-Forger/
 │   ├── lib/
 │   │   ├── components/     # UI components
 │   │   ├── stores/         # Svelte stores
-│   │   └── data/           # Templates and static data
+│   │   └── data/           # Templates data
 │   └── routes/             # SvelteKit routes
 ├── src-tauri/              # Tauri backend (Rust)
 │   ├── src/                # Rust source code
-│   └── icons/              # Application icons
+│   └── icons/              # App icons
 └── static/                 # Static assets
 ```
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome!
 
 1. Fork the repository
 2. Create your feature branch (`git checkout -b feature/amazing-feature`)
@@ -103,15 +126,18 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## Tech Stack
 
-- [Tauri v2](https://v2.tauri.app/) - Desktop application framework
-- [SvelteKit](https://kit.svelte.dev/) - Frontend framework
-- [Tailwind CSS](https://tailwindcss.com/) - Styling
-- [Lucide Icons](https://lucide.dev/) - UI icons
-- [Iconify](https://iconify.design/) - Icon discovery API
+| Technology | Description |
+|------------|-------------|
+| [Tauri v2](https://v2.tauri.app/) | Desktop application framework |
+| [SvelteKit](https://kit.svelte.dev/) | Frontend framework |
+| [Tailwind CSS](https://tailwindcss.com/) | Utility-first CSS |
+| [Rust](https://www.rust-lang.org/) | Backend language |
+| [Lucide Icons](https://lucide.dev/) | UI icons |
+| [Iconify](https://iconify.design/) | Icon discovery API |
 
 ## License
 
-This project is open source and available under the [MIT License](LICENSE).
+This project is open source under the [MIT License](LICENSE).
 
 ## Author
 
@@ -119,4 +145,4 @@ Developed by [enowdev](https://github.com/enowdev)
 
 ---
 
-If you find this project useful, please consider giving it a star on GitHub!
+If you find this project useful, please consider giving it a star!

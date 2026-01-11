@@ -53,6 +53,15 @@ const initialProgress: GenerateProgress = {
 export const generateProgress = writable<GenerateProgress>(initialProgress);
 export const lastResult = writable<GenerateResult | null>(null);
 
+// Reset completed state (call when templates change)
+export function resetCompletedState() {
+  generateProgress.update(p => ({
+    ...p,
+    completedTemplates: [],
+    results: []
+  }));
+}
+
 let progressUnlisten: (() => void) | null = null;
 let completeUnlisten: (() => void) | null = null;
 

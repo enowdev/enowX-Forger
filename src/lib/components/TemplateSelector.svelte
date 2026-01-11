@@ -1,15 +1,16 @@
 <script lang="ts">
-  import { Check, Monitor, Globe, Smartphone, Gamepad2, Package, Plus, Search } from 'lucide-svelte';
+  import { Check, Monitor, Globe, Smartphone, Gamepad2, Package, Plus, Search, CheckCheck } from 'lucide-svelte';
   import { cn } from '$lib/utils';
   import { templates, categories, getTemplateIconUrl } from '$lib/data/templates';
 
   interface Props {
     selectedTemplates: string[];
     onToggle: (templateId: string) => void;
+    onToggleAll: () => void;
     onCustomClick?: () => void;
   }
 
-  let { selectedTemplates, onToggle, onCustomClick }: Props = $props();
+  let { selectedTemplates, onToggle, onToggleAll, onCustomClick }: Props = $props();
   
   let searchQuery = $state('');
   let selectedCategory = $state('all');
@@ -39,18 +40,37 @@
     
     return result;
   });
+
+  // Check if all templates are selected
+  let allSelected = $derived(() => {
+    return templates.length > 0 && templates.every(t => selectedTemplates.includes(t.id));
+  });
 </script>
 
 <div class="flex flex-col h-full">
-  <!-- Search -->
-  <div class="relative mb-3">
-    <Search class="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
-    <input
-      type="text"
-      placeholder="Search templates..."
-      bind:value={searchQuery}
-      class="w-full pl-9 pr-3 py-2 text-xs xl:text-sm bg-zinc-800 border border-zinc-700 rounded-lg text-zinc-200 placeholder:text-zinc-500 focus:outline-none focus:border-zinc-600"
-    />
+  <!-- Search & Actions -->
+  <div class="flex gap-2 mb-3">
+    <div class="relative flex-1">
+      <Search class="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+      <input
+        type="text"
+        placeholder="Search templates..."
+        bind:value={searchQuery}
+        class="w-full pl-9 pr-3 py-2 text-xs xl:text-sm bg-zinc-800 border border-zinc-700 rounded-lg text-zinc-200 placeholder:text-zinc-500 focus:outline-none focus:border-zinc-600"
+      />
+    </div>
+    <button
+      class={cn(
+        "px-2.5 py-2 text-xs rounded-lg border transition-colors flex items-center gap-1.5",
+        allSelected()
+          ? "bg-blue-600 border-blue-500 text-white hover:bg-blue-700"
+          : "bg-zinc-800 border-zinc-700 hover:border-zinc-600 text-zinc-400 hover:text-zinc-200"
+      )}
+      onclick={onToggleAll}
+      title={allSelected() ? "Deselect All" : "Select All"}
+    >
+      <CheckCheck class="w-4 h-4" />
+    </button>
   </div>
 
   <!-- Category Tabs -->

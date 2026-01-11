@@ -26,7 +26,7 @@
 
   let { selectedTemplates, previewUrl, selectedFile }: Props = $props();
 
-  let expandedProjects = $state<Set<string>>(new Set(['tauri']));
+  let expandedProjects = $state<Set<string>>(new Set());
   let resultModalOpen = $state(false);
   let currentResult = $state<GenerateResult | null>(null);
 
