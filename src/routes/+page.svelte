@@ -9,18 +9,13 @@
   import CustomTemplateModal from '$lib/components/CustomTemplateModal.svelte';
   import Discovery from '$lib/components/Discovery.svelte';
   import Settings from '$lib/components/Settings.svelte';
+  import UpdateModal from '$lib/components/UpdateModal.svelte';
   import Card from '$lib/components/ui/card.svelte';
   import Button from '$lib/components/ui/button.svelte';
   import { Trash2 } from 'lucide-svelte';
   import { templates } from '$lib/data/templates';
   import { resetCompletedState } from '$lib/stores/generator';
-  
-  // Editor components
-  import EditorToolbar from '$lib/components/editor/Toolbar.svelte';
-  import EditorCanvas from '$lib/components/editor/Canvas.svelte';
-  import LayersPanel from '$lib/components/editor/LayersPanel.svelte';
-  import PropertiesPanel from '$lib/components/editor/PropertiesPanel.svelte';
-  import KeyboardShortcuts from '$lib/components/editor/KeyboardShortcuts.svelte';
+  import { updateState } from '$lib/stores/updater';
 
   let activeTab = $state('generate');
   let selectedTemplates = $state<string[]>(['tauri']);
@@ -83,6 +78,9 @@
 <div class="h-screen flex flex-col overflow-hidden bg-zinc-900">
   <Titlebar />
   
+  <!-- Update Modal -->
+  <UpdateModal />
+  
   <div class="flex-1 flex overflow-hidden">
     <Sidebar {activeTab} onTabChange={(tab: string) => (activeTab = tab)} />
 
@@ -142,23 +140,19 @@
         />
 
       {:else if activeTab === 'editor'}
-        <KeyboardShortcuts />
-        <div class="h-full flex">
-          <!-- Left Toolbar -->
-          <EditorToolbar />
-          
-          <!-- Canvas -->
-          <EditorCanvas />
-          
-          <!-- Right Panels -->
-          <div class="w-56 xl:w-64 flex flex-col">
-            <div class="flex-1 min-h-0">
-              <LayersPanel />
-            </div>
-            <div class="h-1/2 min-h-0 border-t border-zinc-800">
-              <PropertiesPanel />
-            </div>
+        <div class="h-full flex flex-col items-center justify-center text-center p-8">
+          <div class="w-16 h-16 mb-4 rounded-2xl bg-zinc-800 flex items-center justify-center">
+            <svg class="w-8 h-8 text-zinc-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 19l7-7 3 3-7 7-3-3z"/>
+              <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/>
+              <path d="M2 2l7.586 7.586"/>
+              <circle cx="11" cy="11" r="2"/>
+            </svg>
           </div>
+          <h3 class="text-lg font-semibold text-zinc-200 mb-2">Editor Coming Soon</h3>
+          <p class="text-sm text-zinc-500 max-w-sm">
+            We're crafting a powerful layer-based editor for creating and editing icons. Stay tuned for updates!
+          </p>
         </div>
 
       {:else if activeTab === 'discovery'}
@@ -179,7 +173,7 @@
               </p>
               <div class="mt-5 pt-4 border-t border-zinc-800 space-y-3">
                 <div>
-                  <p class="text-xs text-zinc-500">Version 0.1.0</p>
+                  <p class="text-xs text-zinc-500">Version {$updateState.currentVersion}</p>
                   <p class="text-xs text-zinc-600 mt-1">Developed by enowdev</p>
                 </div>
                 <a 
@@ -213,7 +207,7 @@
   
   <!-- Footer -->
   <footer class="h-7 flex items-center justify-between px-4 bg-zinc-900 border-t border-zinc-800 text-[10px] text-zinc-500">
-    <span>enowX Forger v0.1.0</span>
-    <span>Made with love by enowdev</span>
+    <span>enowX Forger v{$updateState.currentVersion}</span>
+    <span>Developed by <a href="https://github.com/enowdev" target="_blank" rel="noopener noreferrer" class="text-zinc-400 hover:text-zinc-300 transition-colors">enowdev</a></span>
   </footer>
 </div>
