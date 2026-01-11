@@ -16,6 +16,7 @@ A cross-platform desktop application for generating app icons across multiple pl
 
 ## Table of Contents
 
+- [Download](#download)
 - [Features](#features)
 - [Installation](#installation)
 - [Usage](#usage)
@@ -25,6 +26,21 @@ A cross-platform desktop application for generating app icons across multiple pl
 - [Tech Stack](#tech-stack)
 - [License](#license)
 - [Author](#author)
+
+## Download
+
+Download the latest version from [GitHub Releases](https://github.com/enowdev/enowX-Forger/releases/latest).
+
+| Platform | Download |
+|----------|----------|
+| Windows (Installer) | `.exe` or `.msi` |
+| Windows (Portable) | `_portable.zip` |
+| macOS (Apple Silicon) | `_aarch64.dmg` |
+| macOS (Intel) | `_x64.dmg` |
+| Linux (Universal) | `.AppImage` |
+| Linux (Debian/Ubuntu) | `.deb` |
+
+> Windows and Linux users will receive automatic updates. macOS users please download manually.
 
 ## Features
 
@@ -55,6 +71,12 @@ A cross-platform desktop application for generating app icons across multiple pl
 - Download in SVG, PNG, or WebP format
 
 ## Installation
+
+For most users, download the pre-built binaries from the [Download](#download) section above.
+
+### Development Setup
+
+If you want to build from source:
 
 ### Prerequisites
 
