@@ -89,6 +89,8 @@ npm run tauri dev
 
 ## Building
 
+### Local Build
+
 ```bash
 # Build for production
 bun run tauri build
@@ -96,7 +98,18 @@ bun run tauri build
 npm run tauri build
 ```
 
-Output will be in `src-tauri/target/release/bundle/`.
+Output locations:
+- **Windows**: `src-tauri/target/release/bundle/nsis/` (installer) and `src-tauri/target/release/` (portable .exe)
+- **macOS**: `src-tauri/target/release/bundle/dmg/` and `src-tauri/target/release/bundle/macos/`
+- **Linux**: `src-tauri/target/release/bundle/appimage/` and `src-tauri/target/release/bundle/deb/`
+
+### Cross-Platform Notes
+
+- **Windows**: Builds `.exe` (portable) and `.msi`/NSIS installer
+- **macOS**: Requires macOS to build (Apple code signing). Builds `.dmg` and `.app`
+- **Linux**: Builds `.AppImage` (portable) and `.deb`
+
+> Note: macOS builds require a Mac due to Apple's code signing requirements. Use GitHub Actions for automated cross-platform builds.
 
 ## Project Structure
 

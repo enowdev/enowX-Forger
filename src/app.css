@@ -93,3 +93,8 @@ input, textarea, [contenteditable="true"] {
   -ms-user-select: text;
   user-select: text;
 }
+
+/* Disable context menu globally (except editor) */
+body {
+  -webkit-app-region: no-drag;
+}

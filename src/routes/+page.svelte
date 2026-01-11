@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import Titlebar from '$lib/components/Titlebar.svelte';
   import Sidebar from '$lib/components/Sidebar.svelte';
   import ImageUploader from '$lib/components/ImageUploader.svelte';
@@ -27,6 +28,19 @@
   let selectedFile = $state<File | null>(null);
   let bgRemoverEnabled = $state(false);
   let customModalOpen = $state(false);
+
+  // Disable right-click except in editor
+  onMount(() => {
+    const handleContextMenu = (e: MouseEvent) => {
+      // Allow right-click only in editor tab
+      if (activeTab !== 'editor') {
+        e.preventDefault();
+      }
+    };
+    
+    document.addEventListener('contextmenu', handleContextMenu);
+    return () => document.removeEventListener('contextmenu', handleContextMenu);
+  });
 
   function handleImageSelect(file: File) {
     selectedFile = file;
