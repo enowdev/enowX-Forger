@@ -62,7 +62,7 @@
   },
   "plugins": {
     "updater": {
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IERFOTc5RDRFMUNGQ0JDRUIKUldUcnZQd2NUcDJYM2xNTkpCNWs1MUhFdzNqMWRzZ3QrWUg0dDF6OG9vWVZ3bzE4b1hvOGVzNk8K",
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEEyN0QwOThGQkZCRDNERjMKUldUelBiMi9qd2w5b3ZBVXFIMUJsSmdhdWMzNTB3SGNIYmovNnl4RVJmMDQrT0g5ZWRYbHZkVDkK",
       "endpoints": [
         "https://github.com/enowdev/enowX-Forger/releases/latest/download/latest.json"
       ],
