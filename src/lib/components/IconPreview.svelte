@@ -1,17 +1,25 @@
 <script lang="ts">
-  import { Download, FolderOpen, ChevronDown, ChevronRight } from 'lucide-svelte';
+  import { Download, FolderOpen, ChevronDown, ChevronRight, Loader2, Check, AlertCircle } from 'lucide-svelte';
   import { cn } from '$lib/utils';
   import { templates, type ProjectTemplate } from '$lib/data/templates';
   import Button from '$lib/components/ui/button.svelte';
+  import Modal from '$lib/components/ui/modal.svelte';
+  import { generateIcons, fileToBase64, isGenerating, lastResult, getDefaultOutputPath, type GenerateResult } from '$lib/stores/generator';
+  import { settings } from '$lib/stores/settings';
+  import { open } from '@tauri-apps/plugin-dialog';
+  import { openPath } from '@tauri-apps/plugin-opener';
 
   interface Props {
     selectedTemplates: string[];
     previewUrl: string | null;
+    selectedFile: File | null;
   }
 
-  let { selectedTemplates, previewUrl }: Props = $props();
+  let { selectedTemplates, previewUrl, selectedFile }: Props = $props();
 
   let expandedProjects = $state<Set<string>>(new Set(['tauri']));
+  let resultModalOpen = $state(false);
+  let currentResult = $state<GenerateResult | null>(null);
 
   let selectedProjects = $derived(
     templates.filter((t: ProjectTemplate) => selectedTemplates.includes(t.id))
@@ -30,6 +38,62 @@
     }
     expandedProjects = newSet;
   }
+
+  async function handleGenerate() {
+    if (!selectedFile || selectedTemplates.length === 0) return;
+
+    // Get output path
+    let outputPath = $settings.generateOutputPath;
+    
+    if (!outputPath) {
+      // Ask user to select output folder
+      const selected = await open({
+        directory: true,
+        multiple: false,
+        title: 'Select Output Folder'
+      });
+      
+      if (!selected) return;
+      outputPath = selected as string;
+    }
+
+    // Convert file to base64
+    const imageData = await fileToBase64(selectedFile);
+
+    // Generate for each selected template
+    const allResults: GenerateResult[] = [];
+    
+    for (const templateId of selectedTemplates) {
+      const template = templates.find(t => t.id === templateId);
+      if (!template) continue;
+
+      const result = await generateIcons({
+        image_data: imageData,
+        output_path: outputPath,
+        icons: template.icons,
+        template_name: template.id
+      });
+      
+      allResults.push(result);
+    }
+
+    // Combine results
+    const combinedResult: GenerateResult = {
+      success: allResults.every(r => r.success),
+      generated: allResults.flatMap(r => r.generated),
+      failed: allResults.flatMap(r => r.failed),
+      output_path: outputPath
+    };
+
+    currentResult = combinedResult;
+    resultModalOpen = true;
+  }
+
+  async function openOutputFolder() {
+    if (currentResult?.output_path) {
+      await openPath(currentResult.output_path);
+    }
+  }
 </script>
 
 <div class="h-full flex flex-col">
@@ -40,9 +104,19 @@
         {selectedProjects.length} templates, {totalIcons} icons
       </p>
     </div>
-    <Button variant="default" size="sm" disabled={!previewUrl || selectedTemplates.length === 0}>
-      <Download class="w-3.5 h-3.5 xl:w-4 xl:h-4 mr-1.5" />
-      <span class="text-xs xl:text-sm">Generate</span>
+    <Button 
+      variant="default" 
+      size="sm" 
+      disabled={!previewUrl || selectedTemplates.length === 0 || $isGenerating}
+      onclick={handleGenerate}
+    >
+      {#if $isGenerating}
+        <Loader2 class="w-3.5 h-3.5 xl:w-4 xl:h-4 mr-1.5 animate-spin" />
+        <span class="text-xs xl:text-sm">Generating...</span>
+      {:else}
+        <Download class="w-3.5 h-3.5 xl:w-4 xl:h-4 mr-1.5" />
+        <span class="text-xs xl:text-sm">Generate</span>
+      {/if}
     </Button>
   </div>
 
@@ -101,3 +175,62 @@
     </div>
   {/if}
 </div>
+
+<!-- Result Modal -->
+<Modal open={resultModalOpen} onClose={() => resultModalOpen = false} title="Generation Complete" class="w-[450px]">
+  {#if currentResult}
+    <div class="space-y-4">
+      <!-- Status -->
+      <div class={cn(
+        'flex items-center gap-3 p-4 rounded-lg',
+        currentResult.success ? 'bg-green-500/10 border border-green-500/30' : 'bg-yellow-500/10 border border-yellow-500/30'
+      )}>
+        {#if currentResult.success}
+          <Check class="w-6 h-6 text-green-500" />
+          <div>
+            <p class="font-medium text-green-400">All icons generated successfully!</p>
+            <p class="text-sm text-green-500/70">{currentResult.generated.length} icons created</p>
+          </div>
+        {:else}
+          <AlertCircle class="w-6 h-6 text-yellow-500" />
+          <div>
+            <p class="font-medium text-yellow-400">Generation completed with issues</p>
+            <p class="text-sm text-yellow-500/70">{currentResult.generated.length} succeeded, {currentResult.failed.length} failed</p>
+          </div>
+        {/if}
+      </div>
+
+      <!-- Failed items -->
+      {#if currentResult.failed.length > 0}
+        <div>
+          <p class="text-sm text-zinc-400 mb-2">Failed icons:</p>
+          <div class="max-h-32 overflow-y-auto space-y-1">
+            {#each currentResult.failed as fail}
+              <div class="text-xs bg-zinc-800 rounded px-3 py-2">
+                <span class="text-zinc-300">{fail.name}</span>
+                <span class="text-zinc-500 block truncate">{fail.error}</span>
+              </div>
+            {/each}
+          </div>
+        </div>
+      {/if}
+
+      <!-- Output path -->
+      <div class="bg-zinc-800 rounded-lg p-3">
+        <p class="text-xs text-zinc-500 mb-1">Output folder</p>
+        <p class="text-sm text-zinc-300 truncate">{currentResult.output_path}</p>
+      </div>
+
+      <!-- Actions -->
+      <div class="flex gap-2 pt-2">
+        <Button variant="outline" onclick={() => resultModalOpen = false} class="flex-1">
+          Close
+        </Button>
+        <Button variant="default" onclick={openOutputFolder} class="flex-1">
+          <FolderOpen class="w-4 h-4 mr-1.5" />
+          Open Folder
+        </Button>
+      </div>
+    </div>
+  {/if}
+</Modal>

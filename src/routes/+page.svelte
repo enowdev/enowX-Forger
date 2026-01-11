@@ -103,7 +103,7 @@
 
           <!-- Right Panel -->
           <div class="w-72 xl:w-80 p-4 xl:p-6 border-l border-zinc-800 bg-zinc-900/50 overflow-hidden">
-            <IconPreview {selectedTemplates} {previewUrl} />
+            <IconPreview {selectedTemplates} {previewUrl} {selectedFile} />
           </div>
         </div>
 
