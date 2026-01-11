@@ -58,11 +58,7 @@
         "depends": []
       }
     },
-    "createUpdaterArtifacts": true
+    "createUpdaterArtifacts": false
   },
-  "plugins": {
-    "updater": {
-      "active": false
-    }
-  }
+  "plugins": {}
 }
