@@ -37,7 +37,7 @@ jobs:
           bun-version: latest
 
       - name: Install Rust stable
-        uses: dtolnay/rust-action@stable
+        uses: dtolnay/rust-toolchain@stable
         with:
           targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
 
@@ -60,24 +60,29 @@ jobs:
           tagName: v__VERSION__
           releaseName: 'enowX Forger v__VERSION__'
           releaseBody: |
-            ## What's New
-            
-            See the [changelog](https://github.com/enowdev/enowX-Forger/blob/main/CHANGELOG.md) for details.
-            
             ## Downloads
             
-            | Platform | Download |
-            |----------|----------|
-            | Windows (Installer) | `.msi` or `.exe` |
-            | Windows (Portable) | `_portable.zip` |
-            | macOS (Apple Silicon) | `_aarch64.dmg` |
-            | macOS (Intel) | `_x64.dmg` |
-            | Linux (AppImage) | `.AppImage` |
-            | Linux (Debian) | `.deb` |
+            | Platform | Download | Note |
+            |----------|----------|------|
+            | Windows (Installer) | `.exe` / `.msi` | Recommended |
+            | Windows (Portable) | `_portable.zip` | No installation needed |
+            | macOS (Apple Silicon) | `_aarch64.dmg` | M1/M2/M3 |
+            | macOS (Intel) | `_x64.dmg` | Intel Macs |
+            | Linux | `.AppImage` | Universal (Ubuntu, Arch, Fedora, etc.) |
+            | Linux (Debian/Ubuntu) | `.deb` | Debian-based distros |
             
             ## Auto Update
             
-            Windows and Linux users will receive automatic updates. macOS users please download manually.
+            Windows and Linux users will receive automatic updates.
+            macOS users please download manually from this page.
+            
+            ## Arch Linux
+            
+            Use the `.AppImage` file - it works on all Linux distributions including Arch.
+            ```bash
+            chmod +x enowx-forger_*.AppImage
+            ./enowx-forger_*.AppImage
+            ```
           releaseDraft: true
           prerelease: false
           args: ${{ matrix.args }}
