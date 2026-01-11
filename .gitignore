@@ -8,3 +8,20 @@ node_modules
 !.env.example
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# IDE
+.idea/
+*.swp
+*.swo
+
+# OS
+Thumbs.db
+*.log
+
+# Tauri signing keys (NEVER commit these!)
+*.key
+*.key.pub
+
+# Build artifacts
+dist/
+*.tsbuildinfo
