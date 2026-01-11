@@ -12,10 +12,6 @@ pub enum IconError {
     DecodeError(String),
     #[error("Failed to save image: {0}")]
     SaveError(String),
-    #[error("Failed to create directory: {0}")]
-    DirError(String),
-    #[error("Unsupported format: {0}")]
-    UnsupportedFormat(String),
     #[error("IO error: {0}")]
     IoError(#[from] std::io::Error),
     #[error("Image error: {0}")]
@@ -34,7 +30,7 @@ pub struct IconSize {
 
 #[derive(Debug, Clone, serde::Deserialize)]
 pub struct GenerateRequest {
-    pub image_data: String, // Base64 encoded image
+    pub image_data: String,
     pub output_path: String,
     pub icons: Vec<IconSize>,
     pub template_name: String,
@@ -46,6 +42,7 @@ pub struct GenerateResult {
     pub generated: Vec<String>,
     pub failed: Vec<FailedIcon>,
     pub output_path: String,
+    pub template_name: String,
 }
 
 #[derive(Debug, Clone, serde::Serialize)]
@@ -54,9 +51,16 @@ pub struct FailedIcon {
     pub error: String,
 }
 
+#[derive(Debug, Clone, serde::Serialize)]
+pub struct ProgressEvent {
+    pub template_name: String,
+    pub current: usize,
+    pub total: usize,
+    pub current_icon: String,
+}
+
 /// Decode base64 image data to DynamicImage
 pub fn decode_image(base64_data: &str) -> Result<DynamicImage> {
-    // Remove data URL prefix if present
     let data = if base64_data.contains(',') {
         base64_data.split(',').nth(1).unwrap_or(base64_data)
     } else {
@@ -76,9 +80,10 @@ pub fn decode_image(base64_data: &str) -> Result<DynamicImage> {
     Ok(img)
 }
 
-/// Resize image to specified dimensions
+/// Resize image - use faster filter for speed
 pub fn resize_image(img: &DynamicImage, width: u32, height: u32) -> DynamicImage {
-    img.resize_exact(width, height, FilterType::Lanczos3)
+    // Use CatmullRom for better speed/quality balance (Lanczos3 is slow)
+    img.resize_exact(width, height, FilterType::CatmullRom)
 }
 
 /// Save image as PNG
@@ -93,12 +98,13 @@ pub fn save_webp(img: &DynamicImage, path: &Path) -> Result<()> {
     Ok(())
 }
 
-
 /// Save image as ICO (Windows icon format)
-pub fn save_ico(img: &DynamicImage, path: &Path, sizes: &[u32]) -> Result<()> {
+pub fn save_ico(img: &DynamicImage, path: &Path) -> Result<()> {
     let mut icon_dir = IconDir::new(ResourceType::Icon);
+    // Only include common sizes for faster generation
+    let sizes = [16, 32, 48, 256];
 
-    for &size in sizes {
+    for &size in &sizes {
         let resized = resize_image(img, size, size);
         let rgba = resized.to_rgba8();
         let icon_image = IconImage::from_rgba_data(size, size, rgba.into_raw());
@@ -116,15 +122,12 @@ pub fn save_ico(img: &DynamicImage, path: &Path, sizes: &[u32]) -> Result<()> {
 pub fn save_icns(img: &DynamicImage, path: &Path) -> Result<()> {
     let mut icon_family = icns::IconFamily::new();
 
-    // ICNS standard sizes with RGBA32 format
+    // Only essential sizes for faster generation
     let sizes = [
-        (16, icns::IconType::RGBA32_16x16),
         (32, icns::IconType::RGBA32_32x32),
-        (64, icns::IconType::RGBA32_64x64),
         (128, icns::IconType::RGBA32_128x128),
         (256, icns::IconType::RGBA32_256x256),
         (512, icns::IconType::RGBA32_512x512),
-        (1024, icns::IconType::RGBA32_512x512_2x),
     ];
 
     for (size, icon_type) in sizes {
@@ -153,14 +156,20 @@ pub fn save_icns(img: &DynamicImage, path: &Path) -> Result<()> {
     Ok(())
 }
 
-/// Generate all icons from request
-pub fn generate_icons(request: &GenerateRequest) -> GenerateResult {
+/// Generate icons with progress callback
+pub fn generate_icons_with_progress<F>(request: &GenerateRequest, mut on_progress: F) -> GenerateResult 
+where
+    F: FnMut(ProgressEvent),
+{
     let mut result = GenerateResult {
         success: true,
         generated: Vec::new(),
         failed: Vec::new(),
         output_path: request.output_path.clone(),
+        template_name: request.template_name.clone(),
     };
+
+    let total = request.icons.len();
 
     // Decode source image
     let source_img = match decode_image(&request.image_data) {
@@ -187,10 +196,18 @@ pub fn generate_icons(request: &GenerateRequest) -> GenerateResult {
     }
 
     // Generate each icon
-    for icon in &request.icons {
+    for (index, icon) in request.icons.iter().enumerate() {
+        // Emit progress
+        on_progress(ProgressEvent {
+            template_name: request.template_name.clone(),
+            current: index + 1,
+            total,
+            current_icon: icon.name.clone(),
+        });
+
         let icon_path = output_dir.join(&icon.name);
         
-        // Create subdirectories if needed (e.g., mipmap-hdpi/ic_launcher.png)
+        // Create subdirectories if needed
         if let Some(parent) = icon_path.parent() {
             if let Err(e) = fs::create_dir_all(parent) {
                 result.failed.push(FailedIcon {
@@ -206,14 +223,9 @@ pub fn generate_icons(request: &GenerateRequest) -> GenerateResult {
         let save_result = match icon.format.as_str() {
             "png" => save_png(&resized, &icon_path),
             "webp" => save_webp(&resized, &icon_path),
-            "ico" => {
-                // For ICO, include multiple sizes
-                let sizes = vec![16, 24, 32, 48, 64, 128, 256];
-                save_ico(&source_img, &icon_path, &sizes)
-            }
+            "ico" => save_ico(&source_img, &icon_path),
             "icns" => save_icns(&source_img, &icon_path),
             "svg" => {
-                // SVG can't be generated from raster, just skip or copy
                 result.failed.push(FailedIcon {
                     name: icon.name.clone(),
                     error: "SVG generation from raster not supported".to_string(),

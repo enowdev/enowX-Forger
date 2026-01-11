@@ -1,6 +1,7 @@
 mod icon_generator;
 
-use icon_generator::{GenerateRequest, GenerateResult};
+use icon_generator::{GenerateRequest, GenerateResult, ProgressEvent};
+use tauri::{AppHandle, Emitter};
 
 #[tauri::command]
 fn greet(name: &str) -> String {
@@ -8,8 +9,32 @@ fn greet(name: &str) -> String {
 }
 
 #[tauri::command]
-fn generate_icons(request: GenerateRequest) -> GenerateResult {
-    icon_generator::generate_icons(&request)
+async fn generate_icons(app: AppHandle, request: GenerateRequest) -> GenerateResult {
+    let app_for_progress = app.clone();
+    let app_for_complete = app.clone();
+    
+    // Run in blocking thread to not freeze UI
+    let result = tokio::task::spawn_blocking(move || {
+        icon_generator::generate_icons_with_progress(&request, |progress: ProgressEvent| {
+            let _ = app_for_progress.emit("generate-progress", &progress);
+        })
+    })
+    .await
+    .unwrap_or_else(|e| GenerateResult {
+        success: false,
+        generated: vec![],
+        failed: vec![icon_generator::FailedIcon {
+            name: "task".to_string(),
+            error: e.to_string(),
+        }],
+        output_path: String::new(),
+        template_name: String::new(),
+    });
+
+    // Emit completion event
+    let _ = app_for_complete.emit("generate-complete", &result);
+    
+    result
 }
 
 #[tauri::command]
@@ -18,6 +43,35 @@ fn get_default_output_path() -> String {
         .or_else(dirs::home_dir)
         .map(|p| p.join("enowX-Forger-Output").to_string_lossy().to_string())
         .unwrap_or_else(|| "./output".to_string())
+}
+
+#[tauri::command]
+async fn open_folder(path: String) -> Result<(), String> {
+    #[cfg(target_os = "windows")]
+    {
+        std::process::Command::new("explorer")
+            .arg(&path)
+            .spawn()
+            .map_err(|e| e.to_string())?;
+    }
+    
+    #[cfg(target_os = "macos")]
+    {
+        std::process::Command::new("open")
+            .arg(&path)
+            .spawn()
+            .map_err(|e| e.to_string())?;
+    }
+    
+    #[cfg(target_os = "linux")]
+    {
+        std::process::Command::new("xdg-open")
+            .arg(&path)
+            .spawn()
+            .map_err(|e| e.to_string())?;
+    }
+    
+    Ok(())
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -29,7 +83,8 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             greet,
             generate_icons,
-            get_default_output_path
+            get_default_output_path,
+            open_folder
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

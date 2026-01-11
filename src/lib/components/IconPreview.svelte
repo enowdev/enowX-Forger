@@ -1,13 +1,22 @@
 <script lang="ts">
+  import { onMount, onDestroy } from 'svelte';
   import { Download, FolderOpen, ChevronDown, ChevronRight, Loader2, Check, AlertCircle } from 'lucide-svelte';
   import { cn } from '$lib/utils';
   import { templates, type ProjectTemplate } from '$lib/data/templates';
   import Button from '$lib/components/ui/button.svelte';
   import Modal from '$lib/components/ui/modal.svelte';
-  import { generateIcons, fileToBase64, isGenerating, lastResult, getDefaultOutputPath, type GenerateResult } from '$lib/stores/generator';
+  import { 
+    generateAllTemplates, 
+    fileToBase64, 
+    generateProgress, 
+    lastResult, 
+    openFolder,
+    setupListeners,
+    cleanupListeners,
+    type GenerateResult 
+  } from '$lib/stores/generator';
   import { settings } from '$lib/stores/settings';
   import { open } from '@tauri-apps/plugin-dialog';
-  import { openPath } from '@tauri-apps/plugin-opener';
 
   interface Props {
     selectedTemplates: string[];
@@ -20,6 +29,14 @@
   let expandedProjects = $state<Set<string>>(new Set(['tauri']));
   let resultModalOpen = $state(false);
   let currentResult = $state<GenerateResult | null>(null);
+
+  onMount(() => {
+    setupListeners();
+  });
+
+  onDestroy(() => {
+    cleanupListeners();
+  });
 
   let selectedProjects = $derived(
     templates.filter((t: ProjectTemplate) => selectedTemplates.includes(t.id))
@@ -46,7 +63,6 @@
     let outputPath = $settings.generateOutputPath;
     
     if (!outputPath) {
-      // Ask user to select output folder
       const selected = await open({
         directory: true,
         multiple: false,
@@ -60,40 +76,44 @@
     // Convert file to base64
     const imageData = await fileToBase64(selectedFile);
 
-    // Generate for each selected template
-    const allResults: GenerateResult[] = [];
-    
-    for (const templateId of selectedTemplates) {
-      const template = templates.find(t => t.id === templateId);
-      if (!template) continue;
+    // Get templates to generate
+    const templatesToGenerate = selectedProjects.map(t => ({
+      id: t.id,
+      icons: t.icons
+    }));
 
-      const result = await generateIcons({
-        image_data: imageData,
-        output_path: outputPath,
-        icons: template.icons,
-        template_name: template.id
-      });
-      
-      allResults.push(result);
-    }
+    // Generate all templates
+    const results = await generateAllTemplates(imageData, outputPath, templatesToGenerate);
 
     // Combine results
     const combinedResult: GenerateResult = {
-      success: allResults.every(r => r.success),
-      generated: allResults.flatMap(r => r.generated),
-      failed: allResults.flatMap(r => r.failed),
-      output_path: outputPath
+      success: results.every(r => r.success),
+      generated: results.flatMap(r => r.generated),
+      failed: results.flatMap(r => r.failed),
+      output_path: outputPath,
+      template_name: selectedTemplates.join(', ')
     };
 
     currentResult = combinedResult;
     resultModalOpen = true;
   }
 
-  async function openOutputFolder() {
+  async function handleOpenFolder() {
     if (currentResult?.output_path) {
-      await openPath(currentResult.output_path);
+      try {
+        await openFolder(currentResult.output_path);
+      } catch (e) {
+        console.error('Failed to open folder:', e);
+      }
     }
   }
+
+  // Progress percentage
+  let progressPercent = $derived(
+    $generateProgress.total > 0 
+      ? Math.round(($generateProgress.current / $generateProgress.total) * 100)
+      : 0
+  );
 </script>
 
 <div class="h-full flex flex-col">
@@ -107,18 +127,33 @@
     <Button 
       variant="default" 
       size="sm" 
-      disabled={!previewUrl || selectedTemplates.length === 0 || $isGenerating}
+      disabled={!previewUrl || selectedTemplates.length === 0 || $generateProgress.isGenerating}
       onclick={handleGenerate}
     >
-      {#if $isGenerating}
+      {#if $generateProgress.isGenerating}
         <Loader2 class="w-3.5 h-3.5 xl:w-4 xl:h-4 mr-1.5 animate-spin" />
-        <span class="text-xs xl:text-sm">Generating...</span>
+        <span class="text-xs xl:text-sm">{progressPercent}%</span>
       {:else}
         <Download class="w-3.5 h-3.5 xl:w-4 xl:h-4 mr-1.5" />
         <span class="text-xs xl:text-sm">Generate</span>
       {/if}
     </Button>
   </div>
+
+  <!-- Progress Bar -->
+  {#if $generateProgress.isGenerating}
+    <div class="mb-3 space-y-1">
+      <div class="h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+        <div 
+          class="h-full bg-blue-500 transition-all duration-200"
+          style="width: {progressPercent}%"
+        ></div>
+      </div>
+      <p class="text-[10px] text-zinc-500 truncate">
+        {$generateProgress.currentTemplate}: {$generateProgress.currentIcon}
+      </p>
+    </div>
+  {/if}
 
   {#if selectedProjects.length === 0}
     <div class="flex-1 flex flex-col items-center justify-center text-zinc-500 border border-zinc-700 rounded-lg bg-zinc-800/30">
@@ -129,6 +164,8 @@
     <div class="flex-1 overflow-y-auto space-y-1 pr-1">
       {#each selectedProjects as project}
         {@const isExpanded = expandedProjects.has(project.id)}
+        {@const isCompleted = $generateProgress.completedTemplates.includes(project.id)}
+        {@const isProcessing = $generateProgress.isGenerating && $generateProgress.currentTemplate === project.id}
         <div class="rounded-lg border border-zinc-700 bg-zinc-800/50 overflow-hidden">
           <!-- Header -->
           <button
@@ -142,7 +179,13 @@
                 <ChevronRight class="w-4 h-4" />
               {/if}
             </div>
-            <FolderOpen class="w-4 h-4 xl:w-5 xl:h-5 text-zinc-500" />
+            {#if isCompleted}
+              <Check class="w-4 h-4 xl:w-5 xl:h-5 text-green-500" />
+            {:else if isProcessing}
+              <Loader2 class="w-4 h-4 xl:w-5 xl:h-5 text-blue-500 animate-spin" />
+            {:else}
+              <FolderOpen class="w-4 h-4 xl:w-5 xl:h-5 text-zinc-500" />
+            {/if}
             <span class="font-medium text-xs xl:text-sm text-zinc-200 flex-1 text-left">{project.name}</span>
             <span class="text-[10px] xl:text-xs text-zinc-500 bg-zinc-700 px-1.5 py-0.5 rounded">
               {project.icons.length}
@@ -226,7 +269,7 @@
         <Button variant="outline" onclick={() => resultModalOpen = false} class="flex-1">
           Close
         </Button>
-        <Button variant="default" onclick={openOutputFolder} class="flex-1">
+        <Button variant="default" onclick={handleOpenFolder} class="flex-1">
           <FolderOpen class="w-4 h-4 mr-1.5" />
           Open Folder
         </Button>

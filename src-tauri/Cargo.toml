@@ -32,4 +32,5 @@ icns = "0.3"
 base64 = "0.22"
 thiserror = "2"
 dirs = "5"
+tokio = { version = "1", features = ["rt", "sync"] }
 
