@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { Check, Monitor, Globe, Smartphone, Apple, Zap, Layout, Search, Gamepad2, Package, Plus } from 'lucide-svelte';
+  import { Check, Monitor, Globe, Smartphone, Gamepad2, Package, Plus, Search } from 'lucide-svelte';
   import { cn } from '$lib/utils';
-  import { templates, categories, type ProjectTemplate } from '$lib/data/templates';
+  import { templates, categories, getTemplateIconUrl } from '$lib/data/templates';
 
   interface Props {
     selectedTemplates: string[];
@@ -21,19 +21,6 @@
     game: Gamepad2,
     other: Package
   };
-
-  const iconMap: Record<string, typeof Monitor> = {
-    tauri: Monitor,
-    electron: Zap,
-    nextjs: Globe,
-    android: Smartphone,
-    ios: Apple,
-    pwa: Layout
-  };
-
-  function getIcon(templateId: string, category: string) {
-    return iconMap[templateId] || categoryIcons[category] || Package;
-  }
 
   let filteredTemplates = $derived(() => {
     let result = templates;
@@ -113,7 +100,6 @@
 
       {#each filteredTemplates() as template}
         {@const isSelected = selectedTemplates.includes(template.id)}
-        {@const Icon = getIcon(template.id, template.category)}
         <button
           class={cn(
             'relative flex flex-col items-center p-3 xl:p-4 rounded-lg border transition-all',
@@ -128,8 +114,13 @@
               <Check class="w-3.5 h-3.5 xl:w-4 xl:h-4 text-blue-400" />
             </div>
           {/if}
-          <div class={cn('p-2 xl:p-2.5 rounded mb-1.5 xl:mb-2', isSelected ? 'bg-blue-500/20' : 'bg-zinc-700')}>
-            <Icon class="w-5 h-5 xl:w-6 xl:h-6 text-zinc-300" />
+          <div class={cn('p-2 xl:p-2.5 rounded mb-1.5 xl:mb-2 flex items-center justify-center', isSelected ? 'bg-blue-500/20' : 'bg-zinc-700')}>
+            <img 
+              src={getTemplateIconUrl(template.icon)} 
+              alt={template.name}
+              class="w-5 h-5 xl:w-6 xl:h-6"
+              loading="lazy"
+            />
           </div>
           <span class="font-medium text-xs xl:text-sm text-zinc-200 text-center leading-tight">{template.name}</span>
           <span class="text-[10px] xl:text-xs text-zinc-500">{template.icons.length} icons</span>

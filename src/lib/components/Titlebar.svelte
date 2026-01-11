@@ -63,8 +63,8 @@
     class="flex-1 flex items-center gap-2 px-3 h-full cursor-default"
     onmousedown={handleDragStart}
   >
-    <div class="w-4 h-4 rounded bg-blue-600"></div>
-    <span class="text-xs font-medium text-zinc-300">Enowx Forger</span>
+    <img src="/app-icon.png" alt="enowX Forger" class="w-4 h-4" />
+    <span class="text-xs font-medium text-zinc-300">enowX Forger</span>
   </div>
   <div class="flex">
     <button

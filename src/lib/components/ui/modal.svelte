@@ -8,10 +8,11 @@
     onClose: () => void;
     title: string;
     class?: string;
+    zIndex?: number;
     children: Snippet;
   }
 
-  let { open, onClose, title, class: className, children }: Props = $props();
+  let { open, onClose, title, class: className, zIndex = 50, children }: Props = $props();
 
   function handleBackdropClick(e: MouseEvent) {
     if (e.target === e.currentTarget) {
@@ -31,7 +32,7 @@
 {#if open}
   <!-- svelte-ignore a11y_no_static_element_interactions -->
   <div
-    class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+    class={cn("fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm", zIndex === 60 ? 'z-[60]' : 'z-50')}
     onclick={handleBackdropClick}
   >
     <div class={cn('bg-zinc-900 border border-zinc-700 rounded-lg shadow-xl max-h-[80vh] flex flex-col', className)}>

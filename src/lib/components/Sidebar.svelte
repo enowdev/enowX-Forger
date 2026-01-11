@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Image, Layers, Pencil, Settings, Info } from 'lucide-svelte';
+  import { Image, Compass, Pencil, Settings, Info } from 'lucide-svelte';
   import { cn } from '$lib/utils';
 
   interface Props {
@@ -12,7 +12,7 @@
   const tabs = [
     { id: 'generate', icon: Image, label: 'Generate' },
     { id: 'editor', icon: Pencil, label: 'Editor' },
-    { id: 'templates', icon: Layers, label: 'Templates' },
+    { id: 'discovery', icon: Compass, label: 'Discovery' },
     { id: 'settings', icon: Settings, label: 'Settings' },
     { id: 'about', icon: Info, label: 'About' }
   ];

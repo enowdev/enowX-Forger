@@ -10,6 +10,7 @@ export interface ProjectTemplate {
   name: string;
   description: string;
   category: string;
+  icon: string; // Icon name from logos collection (SVG Logos by Gil Barbara)
   icons: IconSize[];
 }
 
@@ -21,6 +22,11 @@ export const categories = [
   { id: 'other', name: 'Other' }
 ];
 
+// Helper to get icon URL from SVG Logos collection
+export function getTemplateIconUrl(iconName: string): string {
+  return `https://api.iconify.design/logos/${iconName}.svg`;
+}
+
 export const templates: ProjectTemplate[] = [
   // Desktop
   {
@@ -28,6 +34,7 @@ export const templates: ProjectTemplate[] = [
     name: 'Tauri',
     description: 'Desktop app icons for Tauri v2',
     category: 'desktop',
+    icon: 'tauri',
     icons: [
       { name: '32x32.png', width: 32, height: 32, format: 'png' },
       { name: '128x128.png', width: 128, height: 128, format: 'png' },
@@ -52,6 +59,7 @@ export const templates: ProjectTemplate[] = [
     name: 'Electron',
     description: 'Desktop app icons for Electron',
     category: 'desktop',
+    icon: 'electron',
     icons: [
       { name: 'icon.png', width: 512, height: 512, format: 'png' },
       { name: 'icon.ico', width: 256, height: 256, format: 'ico' },
@@ -72,6 +80,7 @@ export const templates: ProjectTemplate[] = [
     name: 'NW.js',
     description: 'Desktop app icons for NW.js',
     category: 'desktop',
+    icon: 'nodejs-icon',
     icons: [
       { name: 'icon.png', width: 512, height: 512, format: 'png' },
       { name: 'icon.ico', width: 256, height: 256, format: 'ico' },
@@ -83,6 +92,7 @@ export const templates: ProjectTemplate[] = [
     name: 'Wails',
     description: 'Desktop app icons for Wails (Go)',
     category: 'desktop',
+    icon: 'go',
     icons: [
       { name: 'appicon.png', width: 1024, height: 1024, format: 'png' },
       { name: 'icon.ico', width: 256, height: 256, format: 'ico' },
@@ -94,6 +104,7 @@ export const templates: ProjectTemplate[] = [
     name: 'Neutralino',
     description: 'Desktop app icons for Neutralino.js',
     category: 'desktop',
+    icon: 'javascript',
     icons: [
       { name: 'icon.png', width: 512, height: 512, format: 'png' },
       { name: 'icon.ico', width: 256, height: 256, format: 'ico' },
@@ -105,6 +116,7 @@ export const templates: ProjectTemplate[] = [
     name: 'Windows',
     description: 'Windows application icons',
     category: 'desktop',
+    icon: 'microsoft-windows-icon',
     icons: [
       { name: 'icon.ico', width: 256, height: 256, format: 'ico' },
       { name: '16x16.png', width: 16, height: 16, format: 'png' },
@@ -118,6 +130,7 @@ export const templates: ProjectTemplate[] = [
     name: 'macOS',
     description: 'macOS application icons',
     category: 'desktop',
+    icon: 'apple',
     icons: [
       { name: 'icon.icns', width: 1024, height: 1024, format: 'icns' },
       { name: 'icon_16x16.png', width: 16, height: 16, format: 'png' },
@@ -137,6 +150,7 @@ export const templates: ProjectTemplate[] = [
     name: 'Linux',
     description: 'Linux application icons (freedesktop)',
     category: 'desktop',
+    icon: 'linux-tux',
     icons: [
       { name: '16x16.png', width: 16, height: 16, format: 'png' },
       { name: '22x22.png', width: 22, height: 22, format: 'png' },
@@ -156,6 +170,7 @@ export const templates: ProjectTemplate[] = [
     name: 'Android',
     description: 'Android app launcher icons',
     category: 'mobile',
+    icon: 'android-icon',
     icons: [
       { name: 'mipmap-mdpi/ic_launcher.png', width: 48, height: 48, format: 'png' },
       { name: 'mipmap-hdpi/ic_launcher.png', width: 72, height: 72, format: 'png' },
@@ -170,6 +185,7 @@ export const templates: ProjectTemplate[] = [
     name: 'Android Adaptive',
     description: 'Android adaptive icons (foreground/background)',
     category: 'mobile',
+    icon: 'android-icon',
     icons: [
       { name: 'mipmap-mdpi/ic_launcher_foreground.png', width: 108, height: 108, format: 'png' },
       { name: 'mipmap-hdpi/ic_launcher_foreground.png', width: 162, height: 162, format: 'png' },
@@ -183,6 +199,7 @@ export const templates: ProjectTemplate[] = [
     name: 'iOS',
     description: 'iOS app icons',
     category: 'mobile',
+    icon: 'apple-app-store',
     icons: [
       { name: 'Icon-20.png', width: 20, height: 20, format: 'png' },
       { name: 'Icon-20@2x.png', width: 40, height: 40, format: 'png' },
@@ -206,6 +223,7 @@ export const templates: ProjectTemplate[] = [
     name: 'Flutter',
     description: 'Flutter app icons (iOS & Android)',
     category: 'mobile',
+    icon: 'flutter',
     icons: [
       { name: 'android/mipmap-mdpi/ic_launcher.png', width: 48, height: 48, format: 'png' },
       { name: 'android/mipmap-hdpi/ic_launcher.png', width: 72, height: 72, format: 'png' },
@@ -234,6 +252,7 @@ export const templates: ProjectTemplate[] = [
     name: 'React Native',
     description: 'React Native app icons',
     category: 'mobile',
+    icon: 'react',
     icons: [
       { name: 'android/mipmap-mdpi/ic_launcher.png', width: 48, height: 48, format: 'png' },
       { name: 'android/mipmap-hdpi/ic_launcher.png', width: 72, height: 72, format: 'png' },
@@ -248,6 +267,7 @@ export const templates: ProjectTemplate[] = [
     name: 'Capacitor',
     description: 'Capacitor/Ionic app icons',
     category: 'mobile',
+    icon: 'capacitorjs-icon',
     icons: [
       { name: 'android/mipmap-mdpi/ic_launcher.png', width: 48, height: 48, format: 'png' },
       { name: 'android/mipmap-hdpi/ic_launcher.png', width: 72, height: 72, format: 'png' },
@@ -262,6 +282,7 @@ export const templates: ProjectTemplate[] = [
     name: 'Xamarin',
     description: 'Xamarin app icons',
     category: 'mobile',
+    icon: 'xamarin',
     icons: [
       { name: 'android/icon.png', width: 192, height: 192, format: 'png' },
       { name: 'ios/Icon-App-1024x1024.png', width: 1024, height: 1024, format: 'png' }
@@ -272,6 +293,7 @@ export const templates: ProjectTemplate[] = [
     name: '.NET MAUI',
     description: '.NET MAUI app icons',
     category: 'mobile',
+    icon: 'dotnet',
     icons: [
       { name: 'appicon.svg', width: 512, height: 512, format: 'svg' },
       { name: 'appiconfg.svg', width: 512, height: 512, format: 'svg' }
@@ -282,6 +304,7 @@ export const templates: ProjectTemplate[] = [
     name: 'Kotlin Multiplatform',
     description: 'KMP app icons',
     category: 'mobile',
+    icon: 'kotlin-icon',
     icons: [
       { name: 'android/ic_launcher.png', width: 192, height: 192, format: 'png' },
       { name: 'ios/AppIcon.png', width: 1024, height: 1024, format: 'png' }
@@ -293,6 +316,7 @@ export const templates: ProjectTemplate[] = [
     name: 'Next.js',
     description: 'Next.js app icons',
     category: 'web',
+    icon: 'nextjs-icon',
     icons: [
       { name: 'favicon.ico', width: 48, height: 48, format: 'ico' },
       { name: 'icon.png', width: 512, height: 512, format: 'png' },
@@ -307,6 +331,7 @@ export const templates: ProjectTemplate[] = [
     name: 'Nuxt',
     description: 'Nuxt.js app icons',
     category: 'web',
+    icon: 'nuxt-icon',
     icons: [
       { name: 'favicon.ico', width: 48, height: 48, format: 'ico' },
       { name: 'icon-192.png', width: 192, height: 192, format: 'png' },
@@ -319,6 +344,7 @@ export const templates: ProjectTemplate[] = [
     name: 'SvelteKit',
     description: 'SvelteKit app icons',
     category: 'web',
+    icon: 'svelte-icon',
     icons: [
       { name: 'favicon.png', width: 512, height: 512, format: 'png' },
       { name: 'favicon.ico', width: 48, height: 48, format: 'ico' },
@@ -330,6 +356,7 @@ export const templates: ProjectTemplate[] = [
     name: 'PWA',
     description: 'Progressive Web App icons',
     category: 'web',
+    icon: 'pwa',
     icons: [
       { name: 'icon-72x72.png', width: 72, height: 72, format: 'png' },
       { name: 'icon-96x96.png', width: 96, height: 96, format: 'png' },
@@ -347,6 +374,7 @@ export const templates: ProjectTemplate[] = [
     name: 'Favicon',
     description: 'Standard website favicons',
     category: 'web',
+    icon: 'html-5',
     icons: [
       { name: 'favicon.ico', width: 48, height: 48, format: 'ico' },
       { name: 'favicon-16x16.png', width: 16, height: 16, format: 'png' },
@@ -363,6 +391,7 @@ export const templates: ProjectTemplate[] = [
     name: 'Chrome Extension',
     description: 'Chrome/Edge extension icons',
     category: 'web',
+    icon: 'chrome',
     icons: [
       { name: 'icon-16.png', width: 16, height: 16, format: 'png' },
       { name: 'icon-32.png', width: 32, height: 32, format: 'png' },
@@ -375,6 +404,7 @@ export const templates: ProjectTemplate[] = [
     name: 'Firefox Add-on',
     description: 'Firefox extension icons',
     category: 'web',
+    icon: 'firefox',
     icons: [
       { name: 'icon-48.png', width: 48, height: 48, format: 'png' },
       { name: 'icon-96.png', width: 96, height: 96, format: 'png' }
@@ -386,6 +416,7 @@ export const templates: ProjectTemplate[] = [
     name: 'Unity',
     description: 'Unity game icons',
     category: 'game',
+    icon: 'unity',
     icons: [
       { name: 'icon.png', width: 512, height: 512, format: 'png' },
       { name: 'icon-192.png', width: 192, height: 192, format: 'png' },
@@ -398,6 +429,7 @@ export const templates: ProjectTemplate[] = [
     name: 'Unreal Engine',
     description: 'Unreal Engine game icons',
     category: 'game',
+    icon: 'unrealengine-icon',
     icons: [
       { name: 'icon.ico', width: 256, height: 256, format: 'ico' },
       { name: 'icon.png', width: 512, height: 512, format: 'png' }
@@ -408,6 +440,7 @@ export const templates: ProjectTemplate[] = [
     name: 'Godot',
     description: 'Godot game icons',
     category: 'game',
+    icon: 'godot-icon',
     icons: [
       { name: 'icon.png', width: 512, height: 512, format: 'png' },
       { name: 'icon.ico', width: 256, height: 256, format: 'ico' },
@@ -419,6 +452,7 @@ export const templates: ProjectTemplate[] = [
     name: 'GameMaker',
     description: 'GameMaker Studio icons',
     category: 'game',
+    icon: 'gamemaker',
     icons: [
       { name: 'icon.png', width: 1024, height: 1024, format: 'png' }
     ]
@@ -428,6 +462,7 @@ export const templates: ProjectTemplate[] = [
     name: 'RPG Maker',
     description: 'RPG Maker game icons',
     category: 'game',
+    icon: 'ruby',
     icons: [
       { name: 'icon.ico', width: 256, height: 256, format: 'ico' },
       { name: 'icon.png', width: 512, height: 512, format: 'png' }
@@ -438,6 +473,7 @@ export const templates: ProjectTemplate[] = [
     name: 'Construct',
     description: 'Construct 3 game icons',
     category: 'game',
+    icon: 'c',
     icons: [
       { name: 'icon-16.png', width: 16, height: 16, format: 'png' },
       { name: 'icon-32.png', width: 32, height: 32, format: 'png' },
@@ -452,6 +488,7 @@ export const templates: ProjectTemplate[] = [
     name: 'Steam',
     description: 'Steam store assets',
     category: 'game',
+    icon: 'steam-icon',
     icons: [
       { name: 'icon.ico', width: 256, height: 256, format: 'ico' },
       { name: 'header.png', width: 460, height: 215, format: 'png' },
@@ -468,6 +505,7 @@ export const templates: ProjectTemplate[] = [
     name: 'itch.io',
     description: 'itch.io store assets',
     category: 'game',
+    icon: 'itch-io',
     icons: [
       { name: 'cover.png', width: 630, height: 500, format: 'png' },
       { name: 'screenshot.png', width: 1920, height: 1080, format: 'png' }
@@ -479,6 +517,7 @@ export const templates: ProjectTemplate[] = [
     name: 'VS Code Extension',
     description: 'VS Code extension icons',
     category: 'other',
+    icon: 'visual-studio-code',
     icons: [
       { name: 'icon.png', width: 128, height: 128, format: 'png' }
     ]
@@ -488,6 +527,7 @@ export const templates: ProjectTemplate[] = [
     name: 'JetBrains Plugin',
     description: 'JetBrains IDE plugin icons',
     category: 'other',
+    icon: 'jetbrains-icon',
     icons: [
       { name: 'pluginIcon.svg', width: 40, height: 40, format: 'svg' },
       { name: 'pluginIcon_dark.svg', width: 40, height: 40, format: 'svg' }
@@ -498,6 +538,7 @@ export const templates: ProjectTemplate[] = [
     name: 'npm Package',
     description: 'npm package icon',
     category: 'other',
+    icon: 'npm-icon',
     icons: [
       { name: 'logo.png', width: 512, height: 512, format: 'png' }
     ]
@@ -507,6 +548,7 @@ export const templates: ProjectTemplate[] = [
     name: 'GitHub',
     description: 'GitHub repository assets',
     category: 'other',
+    icon: 'github-icon',
     icons: [
       { name: 'logo.png', width: 512, height: 512, format: 'png' },
       { name: 'social-preview.png', width: 1280, height: 640, format: 'png' }
@@ -517,6 +559,7 @@ export const templates: ProjectTemplate[] = [
     name: 'Discord Bot',
     description: 'Discord bot avatar',
     category: 'other',
+    icon: 'discord-icon',
     icons: [
       { name: 'avatar.png', width: 512, height: 512, format: 'png' }
     ]
@@ -526,6 +569,7 @@ export const templates: ProjectTemplate[] = [
     name: 'Slack App',
     description: 'Slack app icons',
     category: 'other',
+    icon: 'slack-icon',
     icons: [
       { name: 'icon-512.png', width: 512, height: 512, format: 'png' },
       { name: 'icon-192.png', width: 192, height: 192, format: 'png' },
@@ -538,6 +582,7 @@ export const templates: ProjectTemplate[] = [
     name: 'Microsoft Store',
     description: 'Microsoft Store app assets',
     category: 'other',
+    icon: 'microsoft-icon',
     icons: [
       { name: 'StoreLogo.png', width: 50, height: 50, format: 'png' },
       { name: 'Square44x44Logo.png', width: 44, height: 44, format: 'png' },
@@ -552,6 +597,7 @@ export const templates: ProjectTemplate[] = [
     name: 'App Store',
     description: 'Apple App Store assets',
     category: 'other',
+    icon: 'apple-app-store',
     icons: [
       { name: 'icon-1024.png', width: 1024, height: 1024, format: 'png' },
       { name: 'screenshot-iphone-6.5.png', width: 1284, height: 2778, format: 'png' },
@@ -563,6 +609,7 @@ export const templates: ProjectTemplate[] = [
     name: 'Play Store',
     description: 'Google Play Store assets',
     category: 'other',
+    icon: 'google-play-icon',
     icons: [
       { name: 'icon-512.png', width: 512, height: 512, format: 'png' },
       { name: 'feature-graphic.png', width: 1024, height: 500, format: 'png' }

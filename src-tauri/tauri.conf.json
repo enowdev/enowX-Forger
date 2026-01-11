@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "enowx-forger",
+  "productName": "enowX Forger",
   "version": "0.1.0",
   "identifier": "com.enowdev.enowx-forger",
   "build": {
@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "Enowx Forger",
+        "title": "enowX Forger",
         "width": 1100,
         "height": 700,
         "minWidth": 900,
