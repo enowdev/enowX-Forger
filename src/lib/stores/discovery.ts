@@ -357,7 +357,9 @@ export async function downloadIconAsPng(prefix: string, name: string, size: numb
     if (!ctx) return;
 
     const img = new Image();
-    img.crossOrigin = 'anonymous';
+    
+    const svgBase64 = btoa(unescape(encodeURIComponent(svgText)));
+    const dataUrl = `data:image/svg+xml;base64,${svgBase64}`;
     
     await new Promise<void>((resolve, reject) => {
       img.onload = async () => {
@@ -369,7 +371,6 @@ export async function downloadIconAsPng(prefix: string, name: string, size: numb
           return;
         }
         
-        // Use Tauri fs if path is set
         const downloadPath = outputPath || get(settings).downloadPath;
         if (downloadPath) {
           const data = await blobToUint8Array(blob);
@@ -380,12 +381,14 @@ export async function downloadIconAsPng(prefix: string, name: string, size: numb
           }
         }
         
-        // Fallback to browser download
         browserDownload(blob, filename);
         resolve();
       };
-      img.onerror = reject;
-      img.src = 'data:image/svg+xml;base64,' + btoa(decodeURIComponent(encodeURIComponent(svgText)));
+      img.onerror = (e) => {
+        console.error('Image load error:', e);
+        reject(e);
+      };
+      img.src = dataUrl;
     });
   } catch (error) {
     console.error('Failed to download as PNG:', error);
@@ -407,7 +410,9 @@ export async function downloadIconAsWebp(prefix: string, name: string, size: num
     if (!ctx) return;
 
     const img = new Image();
-    img.crossOrigin = 'anonymous';
+    
+    const svgBase64 = btoa(unescape(encodeURIComponent(svgText)));
+    const dataUrl = `data:image/svg+xml;base64,${svgBase64}`;
     
     await new Promise<void>((resolve, reject) => {
       img.onload = async () => {
@@ -419,7 +424,6 @@ export async function downloadIconAsWebp(prefix: string, name: string, size: num
           return;
         }
         
-        // Use Tauri fs if path is set
         const downloadPath = outputPath || get(settings).downloadPath;
         if (downloadPath) {
           const data = await blobToUint8Array(blob);
@@ -430,12 +434,14 @@ export async function downloadIconAsWebp(prefix: string, name: string, size: num
           }
         }
         
-        // Fallback to browser download
         browserDownload(blob, filename);
         resolve();
       };
-      img.onerror = reject;
-      img.src = 'data:image/svg+xml;base64,' + btoa(decodeURIComponent(encodeURIComponent(svgText)));
+      img.onerror = (e) => {
+        console.error('Image load error:', e);
+        reject(e);
+      };
+      img.src = dataUrl;
     });
   } catch (error) {
     console.error('Failed to download as WebP:', error);
